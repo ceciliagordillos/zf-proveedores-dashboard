@@ -1,0 +1,138 @@
+/*
+ * Tokens de diseño: colores, tipografía y espaciado.
+ * Sustituyen a los del entorno de artifacts; los nombres se mantienen para no reescribir dashboard.css.
+ * Modo claro en :root y modo oscuro automático según el sistema operativo.
+ */
+:root {
+  --font-sans: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --font-serif: "Source Serif 4", Georgia, "Times New Roman", serif;
+
+  --color-bg: #f5f6f8;
+  --color-panel: #ffffff;
+  --color-fg: #1a1d24;
+  --color-fg-muted: #5e6573;
+  --color-border-line: #e1e4ea;
+  --color-ok: #137a4b;
+  --color-warn: #9a5b00;
+  --color-bad: #c42b2b;
+
+  --cds-chart-categorical-1: #2f5bea; /* S */
+  --cds-chart-categorical-2: #d14d8b;
+  --cds-chart-categorical-3: #0e9c8f; /* Z */
+  --cds-chart-categorical-4: #1d3f8f;
+  --cds-chart-categorical-5: #e0701b; /* U */
+  --cds-chart-categorical-6: #5a8f1d;
+  --cds-chart-categorical-7: #8a4de8; /* A */
+  --cds-chart-categorical-8: #b5862a;
+  --cds-chart-muted: #9aa1ae; /* G */
+  --cds-chart-grid: #eceef2;
+  --cds-chart-axis: #b9bfca;
+  --cds-chart-reference: #8b93a3;
+  --cds-chart-reference-tint: rgba(110, 120, 140, 0.1);
+  --cds-chart-status-critical: #d93838;
+  --cds-chart-status-warning: #e09b1a;
+  --cds-chart-status-good: #1f9d61;
+
+  --cds-text-secondary: #5e6573;
+  --cds-surface-popover: #ffffff;
+  --cds-border: #e1e4ea;
+  --cds-shadow-popover: 0 8px 24px rgba(0, 0, 0, 0.12), 0 2px 6px rgba(0, 0, 0, 0.08);
+
+  --cds-font-size-caption: 0.75rem;
+  --cds-font-size-body: 0.875rem;
+  --cds-font-size-heading: 1rem;
+  --cds-font-size-title: 1.5rem;
+  --cds-font-weight-medium: 600;
+
+  --cds-gap-xs: 0.375rem;
+  --cds-gap-sm: 0.5rem;
+  --cds-gap-md: 0.75rem;
+  --cds-gap-lg: 1.25rem;
+  --cds-pad-xs: 0.375rem;
+  --cds-pad-sm: 0.5rem;
+  --cds-pad-md: 0.75rem;
+  --cds-pad-lg: 1rem;
+  --cds-radius: 10px;
+
+  --cds-dur-slow: 0.45s;
+  --cds-ease-out: cubic-bezier(0, 0, 0.2, 1);
+
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-bg: #0f1217;
+    --color-panel: #171b22;
+    --color-fg: #e8eaee;
+    --color-fg-muted: #9aa2b1;
+    --color-border-line: #2a303b;
+    --color-ok: #4acb8a;
+    --color-warn: #f0b44c;
+    --color-bad: #ff6b6b;
+
+    --cds-chart-categorical-1: #7c9bff;
+    --cds-chart-categorical-2: #f08cbb;
+    --cds-chart-categorical-3: #3ccfc0;
+    --cds-chart-categorical-4: #8fb0ff;
+    --cds-chart-categorical-5: #ff9a52;
+    --cds-chart-categorical-6: #9ed16a;
+    --cds-chart-categorical-7: #b48cff;
+    --cds-chart-categorical-8: #e2bd6a;
+    --cds-chart-muted: #6b7280;
+    --cds-chart-grid: #222833;
+    --cds-chart-axis: #3a4250;
+    --cds-chart-reference: #7d8596;
+    --cds-chart-reference-tint: rgba(160, 170, 190, 0.1);
+    --cds-chart-status-critical: #ff6b6b;
+    --cds-chart-status-warning: #f0b44c;
+    --cds-chart-status-good: #4acb8a;
+
+    --cds-text-secondary: #9aa2b1;
+    --cds-surface-popover: #1e232c;
+    --cds-border: #2a303b;
+    --cds-shadow-popover: 0 8px 24px rgba(0, 0, 0, 0.5), 0 2px 6px rgba(0, 0, 0, 0.4);
+
+    color-scheme: dark;
+  }
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  background: var(--color-bg);
+  color: var(--color-fg);
+  font-family: var(--font-sans);
+  font-size: var(--cds-font-size-body);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+.app-shell {
+  max-width: 1480px;
+  margin-inline: auto;
+  padding-block: 24px 48px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+@media (min-width: 900px) {
+  .app-shell { padding-left: 32px; padding-right: 32px; }
+}
+.app-banner {
+  margin-bottom: var(--cds-gap-md);
+  padding: var(--cds-pad-sm) var(--cds-pad-md);
+  border-radius: var(--cds-radius);
+  border: 1px solid var(--color-border-line);
+  background: var(--color-panel);
+  font-size: var(--cds-font-size-caption);
+}
+.app-banner.is-error { border-color: var(--cds-chart-status-critical); color: var(--color-bad); }
+
+/* Marcador de carga: barra gris donde aparecerá un valor o una gráfica. */
+.dash-skeleton { color: transparent !important; background: var(--cds-chart-grid); border-radius: 6px; }
+.dash-skeleton * { visibility: hidden; }
+span.dash-skeleton { display: inline-block; min-width: 2.5ch; }
+@media (prefers-reduced-motion: no-preference) {
+  .dash-skeleton { animation: skeleton-pulse 1.2s ease-in-out infinite alternate; }
+  @keyframes skeleton-pulse { from { opacity: 0.55; } to { opacity: 1; } }
+}
+:focus-visible { outline: 2px solid var(--cds-chart-categorical-1); outline-offset: 2px; }

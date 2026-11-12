@@ -1,0 +1,376 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Prototipo del dashboard de gestión de proveedores ZF × CATL: desempeño, integridad de compras, dependencia y pronóstico con machine learning." />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>Proveedores ZF × CATL</title>
+  </head>
+  <body>
+    <div class="app-shell">
+      <div class="app-banner" id="app-banner" role="status" hidden></div>
+      <div class="zf">
+        <header class="zf-head" id="resumen">
+          <h1 id="titulo">Proveedores ZF × CATL: apto, en mejora o bloqueado</h1>
+          <p class="zf-take dash-skeleton" id="takeaway"><span id="tw-scope">En la cartera</span>: <b data-source="conteos" data-field="proveedores" id="tw-n">—</b> proveedores; <b data-source="conteos" data-field="en_rojo" id="tw-rojo">—</b> en Rojo, de ellos <b data-source="conteos" data-field="en_rojo" id="tw-rojo-s">—</b> estratégicos (S); <b data-source="conteos" data-field="aptos" id="tw-aptos">—</b> aptos para negocio nuevo sin condiciones; <b data-source="conteos" data-field="alertas_integridad" id="tw-integ">—</b> alertas de integridad por revisar.</p>
+          <p class="zf-demo"><span class="zf-pill">Datos de demostración</span><span>Proveedores, transacciones y modelos entrenados con datos ficticios; no son datos reales de ZF.</span><span>Corte de datos PerMa: <span data-source="parametros" data-field="fecha_corte" data-row="0">—</span></span></p>
+        </header>
+
+        <div class="zf-filters" id="filtros">
+          <input type="search" class="zf-search" list="zf-names" placeholder="Buscar proveedor o ID…" aria-label="Buscar proveedor">
+          <datalist id="zf-names"></datalist>
+          <select data-param="comprador" aria-label="Comprador" data-source="proveedores"></select>
+          <select data-param="commodity" aria-label="Commodity" data-source="proveedores"></select>
+          <select data-param="division" aria-label="División" data-source="proveedores"></select>
+          <select data-param="pais" aria-label="País" data-source="proveedores"></select>
+          <select data-param="rfq" aria-label="RFQ abierta" data-source="rfqs"></select>
+          <button type="button" class="zf-btn zf-reset">Restablecer</button>
+          <div class="zf-chips" role="group" aria-label="Cuadrante">
+            <span class="zf-lab">Cuadrante</span>
+            <button type="button" class="zf-chip" data-q="">Todos</button>
+            <button type="button" class="zf-chip" data-q="Bloqueado">Bloqueado</button>
+            <button type="button" class="zf-chip" data-q="Rojo">Rojo</button>
+            <button type="button" class="zf-chip" data-q="Amarillo">Amarillo</button>
+            <button type="button" class="zf-chip" data-q="Verde">Verde</button>
+            <button type="button" class="zf-chip" data-q="Azul">Azul</button>
+            <button type="button" class="zf-chip" data-q="Gris – Mantener">Gris – Mantener</button>
+            <button type="button" class="zf-chip" data-q="Gris – Salida">Gris – Salida</button>
+          </div>
+        </div>
+
+        <div class="zf-kpis" id="tarjetas">
+          <button type="button" class="zf-kpi" data-clasif="S" aria-pressed="false" title="S · Estratégico">
+            <span class="zf-kpi-top"><i class="zf-sw" style="--sw: var(--cds-chart-categorical-1)"></i><span class="zf-kpi-l">S</span><span class="zf-kpi-n">Estratégico</span></span>
+            <span class="zf-kpi-v dash-skeleton" data-source="conteos" data-field="proveedores">—</span>
+            <span class="zf-kpi-r"><span data-source="conteos" data-field="en_rojo">—</span> en Rojo</span>
+          </button>
+          <button type="button" class="zf-kpi" data-clasif="A" aria-pressed="false" title="A · Nuevo / Centro de beneficio">
+            <span class="zf-kpi-top"><i class="zf-sw" style="--sw: var(--cds-chart-categorical-7)"></i><span class="zf-kpi-l">A</span><span class="zf-kpi-n">Nuevo / CB</span></span>
+            <span class="zf-kpi-v dash-skeleton" data-source="conteos" data-field="proveedores">—</span>
+            <span class="zf-kpi-r"><span data-source="conteos" data-field="en_rojo">—</span> en Rojo</span>
+          </button>
+          <button type="button" class="zf-kpi" data-clasif="Z" aria-pressed="false" title="Z · Absolutamente necesario">
+            <span class="zf-kpi-top"><i class="zf-sw" style="--sw: var(--cds-chart-categorical-3)"></i><span class="zf-kpi-l">Z</span><span class="zf-kpi-n">Necesario</span></span>
+            <span class="zf-kpi-v dash-skeleton" data-source="conteos" data-field="proveedores">—</span>
+            <span class="zf-kpi-r"><span data-source="conteos" data-field="en_rojo">—</span> en Rojo</span>
+          </button>
+          <button type="button" class="zf-kpi" data-clasif="U" aria-pressed="false" title="U · No deseado">
+            <span class="zf-kpi-top"><i class="zf-sw" style="--sw: var(--cds-chart-categorical-5)"></i><span class="zf-kpi-l">U</span><span class="zf-kpi-n">No deseado</span></span>
+            <span class="zf-kpi-v dash-skeleton" data-source="conteos" data-field="proveedores">—</span>
+            <span class="zf-kpi-r"><span data-source="conteos" data-field="en_rojo">—</span> en Rojo</span>
+          </button>
+          <button type="button" class="zf-kpi" data-clasif="G" aria-pressed="false" title="G · Bloqueado">
+            <span class="zf-kpi-top"><i class="zf-sw" style="--sw: var(--cds-chart-muted)"></i><span class="zf-kpi-l">G</span><span class="zf-kpi-n">Bloqueado</span></span>
+            <span class="zf-kpi-v dash-skeleton" data-source="conteos" data-field="proveedores">—</span>
+            <span class="zf-kpi-r">Sin negocio nuevo</span>
+          </button>
+          <div class="zf-kpi zf-kpi-sus" title="Promedio del Sustainability Score (GE 2025 + NQC + BPCoC)">
+            <span class="zf-kpi-top"><span class="zf-kpi-l">SUS</span><span class="zf-kpi-n">Score promedio</span></span>
+            <span class="zf-kpi-v dash-skeleton" data-source="conteos" data-field="sus_promedio" id="sus-v">—</span>
+            <span class="zf-kpi-r" id="sus-r"><span data-source="conteos" data-field="pct_ge100" id="sus-ge">—</span> % con GE 2025 = <span data-source="parametros" data-field="ge_ko" data-row="0">—</span> %</span>
+          </div>
+        </div>
+
+        <nav class="zf-tabs" role="tablist" aria-label="Módulos del dashboard">
+          <button type="button" class="zf-tab" role="tab" id="tab-desempeno" data-tab="desempeno" aria-controls="desempeno" aria-selected="true">Desempeño</button>
+          <button type="button" class="zf-tab" role="tab" id="tab-integridad" data-tab="integridad" aria-controls="integridad" aria-selected="false">Integridad de compras <span class="zf-tabn" id="tabn-integ" data-source="conteos" data-field="alertas_integridad"></span></button>
+          <button type="button" class="zf-tab" role="tab" id="tab-dependencia" data-tab="dependencia" aria-controls="dependencia" aria-selected="false">Dependencia <span class="zf-tabn" id="tabn-dep" data-source="conteos" data-field="dep_innecesaria"></span></button>
+          <button type="button" class="zf-tab" role="tab" id="tab-pronostico" data-tab="pronostico" aria-controls="pronostico" aria-selected="false">Pronóstico (ML) <span class="zf-tabn" id="tabn-pron" data-source="conteos" data-field="seg_deterioro"></span></button>
+        </nav>
+
+        <div class="zf-layout">
+          <div class="zf-panels">
+
+            <!-- ============ DESEMPEÑO ============ -->
+            <section class="zf-panel" id="desempeno" role="tabpanel" aria-labelledby="tab-desempeno">
+              <section class="zf-card" id="matriz">
+                <div class="zf-card-h">
+                  <div>
+                    <h2>Calidad × sostenibilidad</h2>
+                    <p class="zf-sub" id="sc-sub">Cada punto es un proveedor. Zona sombreada = falla un gate. Clic para abrir su ficha.</p>
+                  </div>
+                  <div class="zf-toggle" role="group" aria-label="Eje Y">
+                    <button type="button" class="zf-btn" data-y="ge" aria-pressed="true">GE 2025 %</button>
+                    <button type="button" class="zf-btn" data-y="sus" aria-pressed="false">SUS Score</button>
+                  </div>
+                </div>
+                <p class="zf-count">S en zona de riesgo: <span data-source="conteos" data-field="zona_riesgo" id="sc-riesgo">—</span></p>
+                <div class="zf-plotwrap">
+                  <div class="zf-plot dash-skeleton" id="sc-plot" data-source="proveedores evaluacion parametros rfq_elegibles"></div>
+                  <div class="zf-tip" hidden></div>
+                </div>
+                <div class="zf-legend">
+                  <span><i class="zf-sw" style="--sw: var(--cds-chart-categorical-1)"></i>S</span>
+                  <span><i class="zf-sw" style="--sw: var(--cds-chart-categorical-7)"></i>A</span>
+                  <span><i class="zf-sw" style="--sw: var(--cds-chart-categorical-3)"></i>Z</span>
+                  <span><i class="zf-sw" style="--sw: var(--cds-chart-categorical-5)"></i>U</span>
+                  <span><i class="zf-sw" style="--sw: var(--cds-chart-muted)"></i>G</span>
+                  <span>● gates OK · ▲ gate fallido</span>
+                  <span id="sc-size">tamaño = gasto anual</span>
+                </div>
+              </section>
+
+              <section class="zf-card" id="acciones">
+                <div class="zf-card-h">
+                  <div>
+                    <h2 id="acc-title">Acciones automáticas</h2>
+                    <p class="zf-sub">Ordenadas por severidad (Bloqueado, Rojo, Amarillo…) y gasto. Clic en una fila para ver su ficha.</p>
+                  </div>
+                </div>
+                <p class="zf-ctx" id="acc-ctx"></p>
+                <div class="zf-rfqbar" id="rfq-bar" hidden><b id="rfq-id" data-source="rfqs" data-field="rfq_id"></b> · <span id="rfq-titulo" data-source="rfqs" data-field="titulo"></span> · <span id="rfq-comm" data-source="rfqs" data-field="commodity"></span> · cierre <span id="rfq-cierre" data-source="rfqs" data-field="cierre"></span>: <b id="rfq-eleg" data-source="rfq_resumen" data-field="elegibles"></b> elegibles (<span id="rfq-prio" data-source="rfq_resumen" data-field="prioritarios"></span> con acceso prioritario) y <b id="rfq-excl" data-source="rfq_resumen" data-field="fuera"></b> excluidos o no elegibles. En modo RFQ se listan todos los proveedores del commodity.</div>
+                <div class="zf-tablewrap" id="wrap-main">
+                  <table class="zf-table" id="tabla-reglas" data-source="proveedores evaluacion" data-row-key="supplier_id"><thead></thead><tbody></tbody></table>
+                </div>
+                <p class="zf-empty" id="main-empty" hidden></p>
+                <div class="zf-tablewrap" id="wrap-rfq" hidden>
+                  <table class="zf-table" id="tabla-rfq" data-source="rfq_elegibles" data-row-key="rfq_id,supplier_id"><thead></thead><tbody></tbody></table>
+                </div>
+                <p class="zf-empty" id="rfq-empty" hidden></p>
+              </section>
+
+              <section class="zf-card" id="alertas">
+                <div class="zf-card-h">
+                  <div>
+                    <h2>Alertas A1–A3</h2>
+                    <p class="zf-sub">A1 riesgo de incumplimiento 2040 · A2 estratégico en Rojo · A3 pre-Rojo. Se evalúan en cada carga de PerMa.</p>
+                  </div>
+                </div>
+                <div class="zf-tablewrap">
+                  <table class="zf-table" id="tabla-alertas" data-source="alertas" data-row-key="alerta_key"><thead></thead><tbody></tbody></table>
+                </div>
+                <p class="zf-empty" id="al-empty" hidden></p>
+              </section>
+            </section>
+
+            <!-- ============ INTEGRIDAD ============ -->
+            <section class="zf-panel" id="integridad" role="tabpanel" aria-labelledby="tab-integridad" hidden>
+              <div class="zf-tiles">
+                <div class="zf-tile" id="ti-alertas"><span class="zf-tile-l">Alertas por revisar</span><span class="zf-tile-v dash-skeleton" data-source="conteos" data-field="alertas_integridad">—</span><span class="zf-sub">abril a septiembre de 2026</span></div>
+                <div class="zf-tile"><span class="zf-tile-l">Proveedores con alerta</span><span class="zf-tile-v dash-skeleton" data-source="conteos" data-field="prov_con_alerta">—</span><span class="zf-sub">reglas y modelo ML</span></div>
+                <div class="zf-tile"><span class="zf-tile-l">Monto en revisión</span><span class="zf-tile-v"><span class="dash-skeleton" data-source="conteos" data-field="monto_revision_meur">—</span><small>M€</small></span><span class="zf-sub">suma de montos señalados por reglas</span></div>
+                <div class="zf-tile" id="ti-conf"><span class="zf-tile-l">Con conflicto de interés</span><span class="zf-tile-v dash-skeleton" data-source="conteos" data-field="conflictos">—</span><span class="zf-sub">van al jefe de compras, no al comprador</span></div>
+              </div>
+              <p class="zf-note"><b>Cómo se rutean:</b> cada alerta llega a Compliance y al comprador responsable. Si los pedidos señalados los emitió el propio comprador responsable (conflicto de interés), la copia va a su jefe de compras en lugar de a él. Una alerta es una irregularidad por revisar, no una acusación.</p>
+
+              <section class="zf-card" id="gasto-demanda">
+                <div class="zf-card-h">
+                  <div>
+                    <h2 id="ig-title">Gasto real vs. gasto justificado por la demanda</h2>
+                    <p class="zf-sub">Línea base dinámica: lo que la demanda de ZF justifica cada mes, con la tolerancia de las reglas. Proveedor de la ficha: <b id="ig-nombre"></b>.</p>
+                  </div>
+                </div>
+                <div class="zf-plotwrap">
+                  <div class="zf-plot dash-skeleton" id="ig-plot" data-source="gasto_mensual parametros"></div>
+                  <div class="zf-tip" hidden></div>
+                </div>
+                <div class="zf-legend">
+                  <span><i class="zf-key" style="--k: var(--cds-chart-categorical-1)"></i>Gasto real</span>
+                  <span><i class="zf-key" style="--k: var(--cds-chart-status-critical)"></i>Fuera de tolerancia</span>
+                  <span><i class="zf-key line" style="--k: var(--cds-chart-axis)"></i>Justificado por la demanda</span>
+                  <span><i class="zf-key" style="--k: var(--cds-chart-reference-tint)"></i>Tolerancia (+<span data-source="parametros" data-field="tolerancia_gasto" data-row="0" id="ig-tol">—</span>)</span>
+                  <span>◆ Anomalía del modelo ML</span>
+                </div>
+              </section>
+
+              <section class="zf-card" id="alertas-integridad">
+                <div class="zf-card-h">
+                  <div>
+                    <h2>Alertas de integridad</h2>
+                    <p class="zf-sub">Reglas explicables y anomalías del modelo Isolation Forest, ordenadas por severidad. Clic en una fila para ver la ficha del proveedor.</p>
+                  </div>
+                </div>
+                <div class="zf-tablewrap">
+                  <table class="zf-table" id="tabla-integ" data-source="banderas" data-row-key="alerta_id"><thead></thead><tbody></tbody></table>
+                </div>
+                <p class="zf-empty" id="integ-empty" hidden></p>
+              </section>
+            </section>
+
+            <!-- ============ DEPENDENCIA ============ -->
+            <section class="zf-panel" id="dependencia" role="tabpanel" aria-labelledby="tab-dependencia" hidden>
+              <div class="zf-tiles">
+                <div class="zf-tile" id="td-innec"><span class="zf-tile-l">Dependencia innecesaria</span><span class="zf-tile-v dash-skeleton" data-source="conteos" data-field="dep_innecesaria">—</span><span class="zf-sub">hay alternativas y aun así se concentra</span></div>
+                <div class="zf-tile"><span class="zf-tile-l">Sin alternativa calificada</span><span class="zf-tile-v dash-skeleton" data-source="conteos" data-field="dep_sin_alternativa">—</span><span class="zf-sub">hay que calificar un proveedor</span></div>
+                <div class="zf-tile"><span class="zf-tile-l">Dependencia estratégica</span><span class="zf-tile-v dash-skeleton" data-source="conteos" data-field="dep_estrategica">—</span><span class="zf-sub">aceptable con plan de continuidad</span></div>
+                <div class="zf-tile"><span class="zf-tile-l">ZF pesa mucho en sus ventas</span><span class="zf-tile-v dash-skeleton" data-source="conteos" data-field="dep_inversa">—</span><span class="zf-sub">ZF ≥ <span data-source="parametros" data-field="umbral_dependencia_inversa" data-row="0" id="td-inv">—</span> de sus ventas</span></div>
+              </div>
+
+              <section class="zf-card" id="kraljic">
+                <div class="zf-card-h">
+                  <div>
+                    <h2>Matriz de Kraljic por commodity</h2>
+                    <p class="zf-sub">Impacto = gasto anual del commodity contra la mediana; riesgo de suministro asignado de 1 a 5. Tamaño = participación del proveedor principal. Clic para filtrar el commodity.</p>
+                  </div>
+                </div>
+                <div class="zf-plotwrap">
+                  <div class="zf-plot dash-skeleton" id="kr-plot" data-source="dependencia_commodity"></div>
+                  <div class="zf-tip" hidden></div>
+                </div>
+                <div class="zf-legend">
+                  <span><i class="zf-sw" style="--sw: var(--cds-chart-status-critical)"></i>Dependencia innecesaria o sin alternativa</span>
+                  <span><i class="zf-sw" style="--sw: var(--cds-chart-status-warning)"></i>Dependencia estratégica</span>
+                  <span><i class="zf-sw" style="--sw: var(--cds-chart-muted)"></i>Diversificado</span>
+                </div>
+              </section>
+
+              <section class="zf-card" id="dep-commodity">
+                <div class="zf-card-h">
+                  <div>
+                    <h2>Concentración por commodity</h2>
+                    <p class="zf-sub">Se marca dependencia cuando el proveedor principal concentra ≥ <span data-source="parametros" data-field="umbral_dependencia" data-row="0" id="dc-umb">—</span> del gasto. HHI sobre 2,500 = mercado concentrado.</p>
+                  </div>
+                </div>
+                <div class="zf-tablewrap">
+                  <table class="zf-table" id="tabla-depc" data-source="dependencia_commodity" data-row-key="commodity"><thead></thead><tbody></tbody></table>
+                </div>
+              </section>
+
+              <section class="zf-card" id="dep-proveedor">
+                <div class="zf-card-h">
+                  <div>
+                    <h2>Proveedores con riesgo de dependencia</h2>
+                    <p class="zf-sub">Principales de un commodity concentrado y proveedores para los que ZF es una parte grande de sus ventas.</p>
+                  </div>
+                </div>
+                <div class="zf-tablewrap">
+                  <table class="zf-table" id="tabla-depp" data-source="proveedores dependencia" data-row-key="supplier_id"><thead></thead><tbody></tbody></table>
+                </div>
+                <p class="zf-empty" id="depp-empty" hidden></p>
+              </section>
+            </section>
+
+            <!-- ============ PRONÓSTICO ============ -->
+            <section class="zf-panel" id="pronostico" role="tabpanel" aria-labelledby="tab-pronostico" hidden>
+              <div class="zf-tiles">
+                <div class="zf-tile" id="tp-det"><span class="zf-tile-l">Deterioro estructural</span><span class="zf-tile-v dash-skeleton" data-source="conteos" data-field="seg_deterioro">—</span><span class="zf-sub">evaluar segunda fuente</span></div>
+                <div class="zf-tile"><span class="zf-tile-l">Bache temporal</span><span class="zf-tile-v dash-skeleton" data-source="conteos" data-field="seg_bache">—</span><span class="zf-sub">merecen oportunidad</span></div>
+                <div class="zf-tile"><span class="zf-tile-l">Vigilar</span><span class="zf-tile-v dash-skeleton" data-source="conteos" data-field="seg_vigilar">—</span><span class="zf-sub">historial irregular</span></div>
+                <div class="zf-tile"><span class="zf-tile-l">Sin pronóstico</span><span class="zf-tile-v dash-skeleton" data-source="conteos" data-field="seg_sin">—</span><span class="zf-sub">menos de <span data-source="parametros" data-field="min_meses_historial" data-row="0">—</span> meses de historial</span></div>
+              </div>
+              <p class="zf-note"><b>El modelo recomienda; los gates mandan.</b> Un buen historial puede justificar más tiempo para mejorar, pero no saca a nadie de Rojo: ese cuadrante solo cambia cuando el gate se cumple.</p>
+
+              <section class="zf-card" id="pron-matriz">
+                <div class="zf-card-h">
+                  <div>
+                    <h2>Historial vs. riesgo próximo</h2>
+                    <p class="zf-sub">X = consistencia histórica (% de los 24 meses previos sin acercarse al gate). Y = probabilidad de cruzar el gate de calidad en los próximos 3 meses.</p>
+                  </div>
+                </div>
+                <p class="zf-ctx" id="pm-ctx"></p>
+                <div class="zf-plotwrap">
+                  <div class="zf-plot dash-skeleton" id="pm-plot" data-source="pronostico proveedores parametros"></div>
+                  <div class="zf-tip" hidden></div>
+                </div>
+                <div class="zf-legend">
+                  <span><i class="zf-sw" style="--sw: var(--cds-chart-categorical-1)"></i>S</span>
+                  <span><i class="zf-sw" style="--sw: var(--cds-chart-categorical-7)"></i>A</span>
+                  <span><i class="zf-sw" style="--sw: var(--cds-chart-categorical-3)"></i>Z</span>
+                  <span><i class="zf-sw" style="--sw: var(--cds-chart-categorical-5)"></i>U</span>
+                  <span><i class="zf-sw" style="--sw: var(--cds-chart-muted)"></i>G</span>
+                </div>
+              </section>
+
+              <section class="zf-card" id="pron-tabla">
+                <div class="zf-card-h">
+                  <div>
+                    <h2>Pronóstico por proveedor</h2>
+                    <p class="zf-sub">Factores = variables que más mueven la probabilidad de ese proveedor. Clic en una fila para ver su ficha.</p>
+                  </div>
+                </div>
+                <div class="zf-tablewrap">
+                  <table class="zf-table" id="tabla-pron" data-source="proveedores evaluacion pronostico" data-row-key="supplier_id"><thead></thead><tbody></tbody></table>
+                </div>
+                <p class="zf-empty" id="pron-empty" hidden></p>
+              </section>
+
+              <section class="zf-card" id="modelo">
+                <div class="zf-card-h">
+                  <div>
+                    <h2>Ficha de los modelos</h2>
+                    <p class="zf-sub">Entrenados fuera del dashboard en Python (scikit-learn); aquí se cargan sus resultados.</p>
+                  </div>
+                </div>
+                <div class="zf-tablewrap">
+                  <table class="zf-table no-click" id="tabla-modelo" data-source="ml_modelo" data-row-key="clave"><thead></thead><tbody></tbody></table>
+                </div>
+              </section>
+            </section>
+          </div>
+
+          <!-- ============ FICHA ============ -->
+          <aside class="zf-card zf-ficha" id="ficha" aria-live="polite">
+            <div class="zf-card-h">
+              <h2>Ficha de decisión</h2>
+              <p class="zf-sub" id="f-hint">Busca o haz clic en un proveedor.</p>
+            </div>
+            <div>
+              <div class="zf-f-name dash-skeleton" id="f-nombre"></div>
+              <p class="zf-f-meta"><span id="f-id"></span> · Clasificación <span id="f-clasif"></span> · <span id="f-commodity"></span> · <span id="f-pais"></span> · <span id="f-comprador"></span></p>
+            </div>
+            <div class="zf-verdict" id="f-banner">
+              <span class="zf-verdict-v" id="f-veredicto"></span>
+              <span class="zf-verdict-q">Cuadrante <span id="f-cuadrante"></span></span>
+              <span class="zf-verdict-m" id="f-motivo"></span>
+            </div>
+            <dl class="zf-dl">
+              <dt>Acción</dt><dd id="f-accion"></dd>
+              <dt>Dueño</dt><dd id="f-dueno"></dd>
+            </dl>
+            <div class="zf-fsec">
+              <h3>Detalle por pilar</h3>
+              <ul class="zf-pil">
+                <li><i class="dot" id="d-cal"></i><span class="nm">Calidad</span><span class="vl">PPM <span id="f-ratio"></span>× meta · VDA 6.3 <span id="f-vda"></span> %</span></li>
+                <li><i class="dot" id="d-log"></i><span class="nm">Logística</span><span class="vl">DPMI <span id="f-dpmi"></span> · entregas OK <span id="f-entrega"></span> %</span></li>
+                <li><i class="dot" id="d-sus"></i><span class="nm">Sostenibilidad</span><span class="vl">GE <span id="f-ge"></span> % · NQC <span id="f-nqc"></span> % · PCF <span id="f-pcf"></span> / <span id="f-pcfobj"></span> kg CO2e</span></li>
+                <li><i class="dot" id="d-dig"></i><span class="nm">Digitalización</span><span class="vl"><span id="f-procs"></span> de 10 procesos <span id="f-faltan"></span></span></li>
+                <li><i class="dot" id="d-fun"></i><span class="nm">Fundamentos</span><span class="vl">IATF 16949 vence <span id="f-iatf"></span></span></li>
+              </ul>
+            </div>
+            <div class="zf-fsec">
+              <h3>PPM de los últimos 12 meses (línea punteada: sin defectos con causa en ZF)</h3>
+              <div class="zf-spark" id="f-spark" data-source="historial proveedores parametros"></div>
+            </div>
+            <div class="zf-fsec" id="f-pron">
+              <div class="zf-fsec-h"><h3>Pronóstico (modelo ML)</h3><span class="zf-b" id="f-seg"></span></div>
+              <dl class="zf-dl">
+                <dt>Prob. de cruzar el gate en 3 meses</dt><dd id="f-prob"></dd>
+                <dt>Consistencia histórica</dt><dd><span id="f-cons"></span> / 100 · <span id="f-meses"></span> meses · confianza <span id="f-confi"></span></dd>
+                <dt>Defectos con causa en ZF (12 meses)</dt><dd><span id="f-zf"></span> %</dd>
+                <dt>Factores</dt><dd id="f-fact"></dd>
+                <dt>Recomendación</dt><dd id="f-rec"></dd>
+              </dl>
+            </div>
+            <div class="zf-fsec">
+              <div class="zf-fsec-h"><h3>Integridad de compras</h3><span class="zf-muted" id="f-integ-n"></span></div>
+              <ul class="zf-integ" id="f-integ"></ul>
+            </div>
+            <div class="zf-fsec">
+              <h3>Dependencia</h3>
+              <dl class="zf-dl">
+                <dt>Participación en su commodity</dt><dd><span id="f-part"></span> · Kraljic: <span id="f-kraljic"></span></dd>
+                <dt>ZF en sus ventas</dt><dd id="f-inv"></dd>
+                <dt>Diagnóstico</dt><dd id="f-diag"></dd>
+                <dt>Recomendación</dt><dd id="f-drec"></dd>
+              </dl>
+            </div>
+            <div class="zf-alts" id="f-alertas"></div>
+            <div class="zf-btns">
+              <button type="button" class="zf-btn" data-act="Liberar RFQ">Liberar RFQ</button>
+              <button type="button" class="zf-btn" data-act="Invitar a ZF League">Invitar a ZF League</button>
+              <button type="button" class="zf-btn" data-act="Solicitar plan de acción">Solicitar plan de acción</button>
+              <button type="button" class="zf-btn" data-act="Abrir escalación">Abrir escalación</button>
+              <button type="button" class="zf-btn" data-act="Enviar a Compliance">Enviar a Compliance</button>
+              <button type="button" class="zf-btn" data-act="Iniciar doble fuente">Iniciar doble fuente</button>
+            </div>
+            <p class="zf-f-note" id="f-note"></p>
+          </aside>
+        </div>
+
+        <p class="zf-foot" id="reglas">Umbrales activos: banda Alto ≥ <span data-source="parametros" data-field="banda_alto" data-row="0">—</span> y Medio ≥ <span data-source="parametros" data-field="banda_medio" data-row="0">—</span> de Supplier Performance Rate · gate de calidad: PPM sobre <span data-source="parametros" data-field="ppm_factor_gate" data-row="0">—</span>× la meta dos meses seguidos o VDA 6.3 clase C · gate de sostenibilidad: GE 2025 bajo <span data-source="parametros" data-field="ge_ko" data-row="0">—</span> %, NQC bajo <span data-source="parametros" data-field="nqc_min" data-row="0">—</span> % o BPCoC no aceptado · límite de aprobación <span data-source="parametros" data-field="limite_aprobacion_eur" data-row="0" id="ft-lim">—</span> € · tolerancia de precio <span data-source="parametros" data-field="tolerancia_precio" data-row="0" id="ft-tp">—</span> · pronóstico: alto riesgo desde <span data-source="parametros" data-field="umbral_prob" data-row="0" id="ft-up">—</span> y consistencia desde <span data-source="parametros" data-field="umbral_consistencia" data-row="0">—</span>.</p>
+      </div>
+    </div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
