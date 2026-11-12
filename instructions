@@ -1,0 +1,8 @@
+git config --global user.name "Ceci Gordillo"
+git config --global user.email "el-correo-de-tu-cuenta-de-github"
+git init
+git add .
+git commit -m "Prototipo del dashboard de proveedores ZF x CATL"
+git branch -M main
+git remote add origin https://github.com/ceciliagordillos/zf-proveedores-dashboard.git
+git push -u origin main
